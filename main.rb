@@ -11,6 +11,7 @@ class Main
   IMAGE_DIRECTORY_URL = SECRETS["image_directory_url"]
   LATEX_DIRECTORY_RELATIVE_PATH = "latex"
   BOT_USER_ID = 468629052643868673
+  MC_ADDRESS = SECRETS["mc_address_url"]
 
   bot = Discordrb::Commands::CommandBot.new(
     token: SECRETS["api_token"],
@@ -49,26 +50,24 @@ class Main
     )
   end
 
-  # run when command is ~latex
+  # run when command is ~equation
   bot.command(:equation) do |event|
-    begin
-      # Combine every word after 'latex' for multi word arguments (eg \frac{23 a}{32} )
-      args = event.message.content.split(' ').drop(1).join(' ')
+    # Combine every word after 'latex' for multi word arguments (eg \frac{23 a}{32} )
+    args = event.message.content.split(' ').drop(1).join(' ')
 
-      # Clean for escaped latex characters
-      clean_args = LatexService.sanitize(args)
+    # Clean for escaped latex characters
+    clean_args = LatexService.sanitize(args)
 
-      # if it renders properly then send the image
-      # else return error
-      if LatexService.render?(clean_args, LATEX_DIRECTORY_RELATIVE_PATH, 'formula')
-        event.send_file(File.open(File.join(LATEX_DIRECTORY_RELATIVE_PATH, 'formula.png'), 'r'))
-      else
-        return_error(event.channel, 'Formula Didnt Compile')
-      end
-
-      # delete the files created
-      LatexService.cleanup(LATEX_DIRECTORY_RELATIVE_PATH, 'formula')
+    # if it renders properly then send the image
+    # else return error
+    if LatexService.render?(clean_args, LATEX_DIRECTORY_RELATIVE_PATH, 'formula')
+      event.send_file(File.open(File.join(LATEX_DIRECTORY_RELATIVE_PATH, 'formula.png'), 'r'))
+    else
+      return_error(event.channel, 'Formula Didnt Compile')
     end
+
+    # delete the files created
+    LatexService.cleanup(LATEX_DIRECTORY_RELATIVE_PATH, 'formula')
   end
 
   bot.command(:whereis) do |event|
