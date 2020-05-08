@@ -5,6 +5,7 @@ require 'fuzzystringmatch'
 require_relative 'services/discord_message_sender'
 require_relative 'services/building_service'
 require_relative 'services/latex_service'
+require_relative 'services/mcping_service'
 
 class Main
   SECRETS = JSON.parse(File.read('secrets.json'))
@@ -70,6 +71,25 @@ class Main
     LatexService.cleanup(LATEX_DIRECTORY_RELATIVE_PATH, 'formula')
   end
 
+  # ping the minecraft server when ~minecraft is done
+  bot.command(:minecraft) do |event|
+    # ping the server
+    mcServer = McpingService.new(MC_ADDRESS, 25565)
+
+    #sends back an embedded message with the mcServer fields as input
+    DiscordMessageSender.send_embedded(
+      event.channel,
+      title: mcServer.getDesc(),
+      fields: [
+        Discordrb::Webhooks::EmbedField.new(name: "Players", value: "#{mcServer.getOnline()}/#{mcServer.getMax()}", inline: true),
+        Discordrb::Webhooks::EmbedField.new(name: "Online", value: mcServer.getPlayers(), inline: true)
+      ],
+      footer: Discordrb::Webhooks::EmbedFooter.new(text: "#{MC_ADDRESS} | #{mcServer.getLatency()}"),
+    )
+
+  end
+
+  # find where a building is with ~whereis
   bot.command(:whereis) do |event|
     begin
       # Combine every word after 'whereis' for multi-word arguments (e.g. "Erie Hall")
