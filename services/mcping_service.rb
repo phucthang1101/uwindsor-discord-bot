@@ -1,5 +1,6 @@
 require 'socket'
 require 'timeout'
+require 'json'
 
 class McpingService
 
@@ -18,7 +19,8 @@ class McpingService
     @players # list of players
     @latency # latency of the server
 
-    ping()
+    # pings the server
+    ping
   end
 
   # ping function pings the server using the json method from server 1.7
@@ -53,10 +55,15 @@ class McpingService
         serv_connection.write(pack_data("\x00"))
 
         # recieve and read the responses
+        # packet length cause who cares
+        unpack_varint(serv_connection)
+        # packet id cause who cares
+        unpack_varint(serv_connection)
+        # string length
+        size = unpack_varint(serv_connection)
 
-
-
-
+        response = ""
+        response += serv_connection.read(1024) while response.size < size
       end
     # if the socket fails or timesout
     rescue
@@ -65,6 +72,13 @@ class McpingService
     ensure
       servConnection.close
     end
+    ping_response_json = JSON.parse(response)
+
+    puts ping_response_json
+
+    @desc = ping_response_json["description"]["text"]
+    @max = ping_response_json["players"]["max"]
+    @onlinePlayers = ping_response_json["players"]["online"]
 
   end
 
@@ -83,6 +97,17 @@ class McpingService
       end
     end
     varint
+  end
+
+  # idk if thisll work, who knows, its kinda magic
+  def self.unpack_varint(conn)
+    data = 0
+    4.times do |num|
+      tmp = conn.read(1).unpack("C")
+      data |= (tmp & 0x7f) << 7 * num
+      break unless (tmp & 0x80)
+    end
+    data
   end
 
 end
