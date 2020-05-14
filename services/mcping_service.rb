@@ -46,7 +46,6 @@ class McpingService
         start = Time.now
         @serv_connection = TCPSocket.new(@server, @port)
 
-
         # Time object subtract time object returns a float, multiply that by 1000 to get miliseconds and then round
         @latency = ((Time.now - start)* 1000).round
 
