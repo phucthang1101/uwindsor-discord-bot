@@ -151,9 +151,20 @@ class McpingService
     else
       # switches from [{"id"=>"random", "name"=>"something"}, {"id"=>"afljsdk", "name"=>"name"}, ...] format
       # to 'something, name, othername'
-      @players.map { |player| player["name"] }.join(', ').to_s
+      name_list = @players.map { |player| player["name"] }.join(', ').to_s
+      sanitize_names(name_list)
     end
   end
+
+  # sanitize the player names according the markdown so weird things dont happen
+  def sanitize_names(input)
+    res_chars = ["*", "_", "~", ">", "`"]
+    res_chars.each do |res|
+      input = input.gsub(res, "\\#{res}")
+    end
+    input
+  end
+
 
   # getters
   attr_reader :online
