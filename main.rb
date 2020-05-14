@@ -74,18 +74,32 @@ class Main
   # ping the minecraft server when ~minecraft is done
   bot.command(:minecraft) do |event|
     # ping the server
-    mcServer = McpingService.new(MC_ADDRESS, 25565)
+    mcServer = McpingService.new(MC_ADDRESS)
 
-    #sends back an embedded message with the mcServer fields as input
-    DiscordMessageSender.send_embedded(
-      event.channel,
-      title: mcServer.getDesc(),
-      fields: [
-        Discordrb::Webhooks::EmbedField.new(name: "Players", value: "#{mcServer.getOnline()}/#{mcServer.getMax()}", inline: true),
-        Discordrb::Webhooks::EmbedField.new(name: "Online", value: mcServer.getPlayers(), inline: true)
-      ],
-      footer: Discordrb::Webhooks::EmbedFooter.new(text: "#{MC_ADDRESS} | #{mcServer.getLatency()}"),
-    )
+    if mcServer.online
+      # sends back an embedded message with the mcServer fields as input
+      DiscordMessageSender.send_embedded(
+        event.channel,
+        title: mcServer.desc,
+        fields: [
+          Discordrb::Webhooks::EmbedField.new(name: "Players", value: "#{mcServer.onlinePlayers}/#{mcServer.max}", inline: true),
+          Discordrb::Webhooks::EmbedField.new(name: "Online", value: mcServer.players, inline: true)
+        ],
+        footer: Discordrb::Webhooks::EmbedFooter.new(text: "#{MC_ADDRESS} | #{mcServer.latency}"),
+        thumbnail: Discordrb::Webhooks::EmbedThumbnail.new(url: "#{SECRETS["image_directory_url"]}/css_logo.png")
+      )
+    # for when its not online
+    else
+      DiscordMessageSender.send_embedded(
+        event.channel,
+        title: "Not Online",
+        fields: [
+          Discordrb::Webhooks::EmbedField.new(name: "Players", value: "69/420", inline: true),
+          Discordrb::Webhooks::EmbedField.new(name: "Online", value: "Ur mom, gottem", inline: true)
+        ],
+        footer: Discordrb::Webhooks::EmbedFooter.new(text: "#{MC_ADDRESS} | No latency obvi")
+      )
+    end
 
   end
 
