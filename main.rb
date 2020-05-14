@@ -32,6 +32,7 @@ class Main
         "**`~year <1-4, masters, alumni>`** - add your current academic status to your profile.\n"\
         "**`~purge <2-99>`** - remove the last `n` messages in channel (**admin only**)\n"\
         "**`~equation <latex command>`** - returns an image of a latex equation.\n"\
+        "**`~minecraft`** - returns stats of CSS minecraft server"\
         "**`~help`** - return the help menu\n"\
         "\n\u200B"
     )
