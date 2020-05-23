@@ -81,7 +81,6 @@ class McpingService
     rescue StandardError => e
       puts "error boy #{e.message}"
       @online = false
-      @serv_connection.close
       puts "killed early"
       return
     end
