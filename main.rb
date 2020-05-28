@@ -78,6 +78,22 @@ class Main
     mcServer = McpingService.new(MC_ADDRESS)
 
     if mcServer.online
+      # the colour will show the latency
+      # default blue ish
+      colour = "005696"
+      # if latency is great
+      # green
+      if mcServer.latency < 61
+        colour = "1aa52f"
+      # if latency is bad  
+      # red
+      elsif mcServer.latency > 150
+        colour = "a51a1a"
+      # if latency is okish
+      # orange
+      elsif mcServer.latency > 101
+        colour = "fcaa3f"
+      end
       # sends back an embedded message with the mcServer fields as input
       DiscordMessageSender.send_embedded(
         event.channel,
@@ -87,7 +103,8 @@ class Main
           Discordrb::Webhooks::EmbedField.new(name: "Online", value: mcServer.players, inline: true)
         ],
         footer: Discordrb::Webhooks::EmbedFooter.new(text: "#{MC_ADDRESS} | #{mcServer.latency}"),
-        thumbnail: Discordrb::Webhooks::EmbedThumbnail.new(url: "#{SECRETS["image_directory_url"]}/css_logo.png")
+        thumbnail: Discordrb::Webhooks::EmbedThumbnail.new(url: "#{SECRETS["image_directory_url"]}/css_logo.png"),
+        color: colour
       )
     # for when its not online
     else
@@ -98,7 +115,8 @@ class Main
           Discordrb::Webhooks::EmbedField.new(name: "Players", value: "69/420", inline: true),
           Discordrb::Webhooks::EmbedField.new(name: "Online", value: "Ur mom, gottem", inline: true)
         ],
-        footer: Discordrb::Webhooks::EmbedFooter.new(text: "#{MC_ADDRESS} | No latency obvi")
+        footer: Discordrb::Webhooks::EmbedFooter.new(text: "#{MC_ADDRESS} | No latency obvi"),
+        color: "a51a1a"
       )
     end
 
